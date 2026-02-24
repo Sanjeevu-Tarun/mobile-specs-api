@@ -15,7 +15,7 @@
   "dependencies": {
     "axios": "^1.7.0",
     "cheerio": "^1.0.0",
-    "fastify": "^4.28.0"
+    "fastify": "5.7.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

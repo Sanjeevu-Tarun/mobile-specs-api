@@ -7,6 +7,11 @@ import type { IncomingMessage, ServerResponse } from 'http';
 const app = Fastify({ logger: false });
 const parserService = new ParserService();
 
+// Debug route - visit /debug to confirm handler is working
+app.get('/debug', async (request) => {
+  return { ok: true, url: request.url, method: request.method };
+});
+
 app.get('/brands', async () => {
   const data = await getBrands();
   return { status: true, data };
@@ -42,6 +47,7 @@ app.get('/search', async (request, reply) => {
   return data;
 });
 
+// /:slug must be LAST - it's a catch-all
 app.get('/:slug', async (request) => {
   const slug = (request.params as any).slug;
   const data = await getPhoneDetails(slug);
@@ -56,11 +62,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     ready = true;
   }
 
+  // Log what URL we're actually receiving
+  const url = req.url || '/';
+  console.log('[handler] method:', req.method, 'url:', url);
+
   const response = await app.inject({
     method: (req.method || 'GET') as any,
-    url: req.url || '/',
+    url,
     headers: req.headers as any,
   });
+
+  console.log('[handler] fastify response status:', response.statusCode, 'body:', response.body.slice(0, 200));
 
   res.writeHead(response.statusCode, response.headers as any);
   res.end(response.body);
