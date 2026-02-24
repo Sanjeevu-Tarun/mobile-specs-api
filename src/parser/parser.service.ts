@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { IPhoneListItem, ISearchResult } from '../types';
-import { baseUrl } from '../config';
+import { baseUrl } from '../server';
 
 export async function getHtml(url: string): Promise<string> {
     const { data } = await axios.get(url, {

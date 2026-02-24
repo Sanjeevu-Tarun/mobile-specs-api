@@ -1,6 +1,6 @@
 import { IPhoneDetails } from "../types";
 import * as cheerio from 'cheerio';
-import { baseUrl } from "../config";
+import { baseUrl } from "../server";
 import { TSpecCategory } from "../types";
 import { getHtml } from "./parser.service";
 
