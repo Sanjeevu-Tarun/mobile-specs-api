@@ -4,9 +4,7 @@ import { getPhoneDetails } from '../src/parser/parser.phone-details';
 import { getBrands } from '../src/parser/parser.brands';
 import type { IncomingMessage, ServerResponse } from 'http';
 
-export const baseUrl = 'https://www.gsmarena.com';
-
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: false });
 const parserService = new ParserService();
 
 app.get('/brands', async () => {
@@ -50,10 +48,7 @@ app.get('/:slug', async (request) => {
   return data;
 });
 
-const handler = async (req: IncomingMessage, res: ServerResponse) => {
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
   await app.ready();
   app.server.emit('request', req, res);
-};
-
-export default handler;
-module.exports = handler;
+}
