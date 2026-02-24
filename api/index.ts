@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import { ParserService } from '../src/parser/parser.service';
 import { getPhoneDetails } from '../src/parser/parser.phone-details';
 import { getBrands } from '../src/parser/parser.brands';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const app = Fastify({ logger: false });
 const parserService = new ParserService();
@@ -48,7 +48,23 @@ app.get('/:slug', async (request) => {
   return data;
 });
 
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  await app.ready();
-  app.server.emit('request', req, res);
+let isReady = false;
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!isReady) {
+    await app.ready();
+    isReady = true;
+  }
+
+  const response = await app.inject({
+    method: req.method as any,
+    url: req.url || '/',
+    headers: req.headers as any,
+    payload: req.body ? JSON.stringify(req.body) : undefined,
+  });
+
+  res.status(response.statusCode);
+  const contentType = response.headers['content-type'];
+  if (contentType) res.setHeader('content-type', contentType);
+  res.send(response.body);
 }
